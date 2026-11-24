@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   apiRequest, getToken, setToken, removeToken, getUser, setUser, removeUser, clearSession,
+  getApiUrl, PRODUCTION_API_URL,
 } from './apiHelper'
 
 const mockFetch = (impl) => vi.stubGlobal('fetch', vi.fn(impl))
@@ -89,5 +90,34 @@ describe('apiRequest', () => {
   it('handles network errors', async () => {
     mockFetch(async () => { throw new Error('down') })
     expect(await apiRequest('/a')).toEqual({ status: 'error', message: 'down', data: null })
+  })
+})
+
+describe('getApiUrl', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+
+  it('uses relative path on localhost when env is empty', () => {
+    vi.stubEnv('VITE_API_BASE_URL', '')
+    expect(getApiUrl('/api/x')).toBe('/api/x')
+  })
+
+  it('uses relative path on 127.0.0.1 when env is empty', () => {
+    vi.stubEnv('VITE_API_BASE_URL', '')
+    vi.stubGlobal('location', { hostname: '127.0.0.1' })
+    expect(getApiUrl('/api/x')).toBe('/api/x')
+  })
+
+  it('falls back to production backend on a public host', () => {
+    vi.stubEnv('VITE_API_BASE_URL', '')
+    vi.stubGlobal('location', { hostname: 'ifs24032-pabwe2026-sk-p9-fe-reactjs.s1if.cloud' })
+    expect(getApiUrl('/api/x')).toBe(`${PRODUCTION_API_URL}/api/x`)
+  })
+
+  it('prefers env base url and strips trailing slash', () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'https://api.example.com/')
+    expect(getApiUrl('/api/x')).toBe('https://api.example.com/api/x')
   })
 })

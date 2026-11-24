@@ -22,8 +22,14 @@ export const clearSession = () => {
   removeUser()
 }
 
+export const PRODUCTION_API_URL = 'https://ifs24032-pabwe2026-sk-p9-be-golang-gin.s1if.cloud'
+
+const isLocalHost = (host) => host === 'localhost' || host === '127.0.0.1'
+
 export const getApiUrl = (path) => {
-  const base = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
+  const envBase = import.meta.env.VITE_API_BASE_URL
+  const fallback = isLocalHost(window.location.hostname) ? '' : PRODUCTION_API_URL
+  const base = (envBase || fallback).replace(/\/+$/, '')
   return `${base}${path}`
 }
 
