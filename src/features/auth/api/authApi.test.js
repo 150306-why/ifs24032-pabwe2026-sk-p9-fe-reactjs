@@ -12,8 +12,8 @@ describe('authApi', () => {
     expect(apiRequest).toHaveBeenCalledWith('/api/auth/login', { method: 'POST', body: { username: 'u', password: 'p' } })
   })
   it('register', async () => {
-    await register({ name: 'n', username: 'u', password: 'p' })
-    expect(apiRequest).toHaveBeenCalledWith('/api/auth/register', { method: 'POST', body: { name: 'n', username: 'u', password: 'p' } })
+    await register({ username: 'u', email: 'u@mail.com', password: 'p' })
+    expect(apiRequest).toHaveBeenCalledWith('/api/auth/register', { method: 'POST', body: { username: 'u', email: 'u@mail.com', password: 'p' } })
   })
   it('logout', async () => {
     await logout()

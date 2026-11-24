@@ -9,7 +9,7 @@ const inputClass =
 
 export default function AuthForm({ mode = 'login', onSuccess }) {
   const isLogin = mode === 'login'
-  const [name, onName] = useInput('')
+  const [email, onEmail] = useInput('')
   const [username, onUsername] = useInput('')
   const [password, onPassword] = useInput('')
   const [loading, setLoading] = useState(false)
@@ -19,7 +19,7 @@ export default function AuthForm({ mode = 'login', onSuccess }) {
     setLoading(true)
     const res = isLogin
       ? await login({ username, password })
-      : await register({ name, username, password })
+      : await register({ username, email, password })
     setLoading(false)
     if (res.status === 'success') {
       if (isLogin) {
@@ -37,16 +37,6 @@ export default function AuthForm({ mode = 'login', onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {!isLogin && (
-        <input
-          id="register-name"
-          placeholder="Nama"
-          className={inputClass}
-          value={name}
-          onChange={onName}
-          required
-        />
-      )}
       <input
         id={isLogin ? 'login-username' : 'register-username'}
         placeholder="Username"
@@ -55,6 +45,17 @@ export default function AuthForm({ mode = 'login', onSuccess }) {
         onChange={onUsername}
         required
       />
+      {!isLogin && (
+        <input
+          id="register-email"
+          type="email"
+          placeholder="Email"
+          className={inputClass}
+          value={email}
+          onChange={onEmail}
+          required
+        />
+      )}
       <input
         id={isLogin ? 'login-password' : 'register-password'}
         type="password"
@@ -62,6 +63,7 @@ export default function AuthForm({ mode = 'login', onSuccess }) {
         className={inputClass}
         value={password}
         onChange={onPassword}
+        minLength={isLogin ? undefined : 6}
         required
       />
       <button
